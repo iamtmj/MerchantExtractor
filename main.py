@@ -16,6 +16,20 @@ headers = {
 }
 
 # --- Function to extract merchant name using GPT-3.5 ---
+def call_openrouter(prompt):
+    data = {
+        "model": "openai/gpt-3.5-turbo",
+        "messages": [{"role": "user", "content": prompt}]
+    }
+    try:
+        response = requests.post(API_URL, headers=headers, json=data)
+        result = response.json()
+        return result["choices"][0]["message"]["content"].strip()
+    except Exception as e:
+        st.error(f"OpenRouter API error: {e}")
+        return "[ERROR]"
+
+# --- Extract Merchant Name ---
 def extract_merchant(text):
     clean_text = re.sub(r'[^\w\s]', ' ', str(text))
     clean_text = re.sub(r'\s+', ' ', clean_text).strip()
@@ -43,61 +57,59 @@ Examples:
 
 Now return only the extracted merchant name:
 """
+    return call_openrouter(prompt)
 
-    data = {
-        "model": "openai/gpt-3.5-turbo",
-        "messages": [{"role": "user", "content": prompt}]
-    }
+# --- Infer Expense Category ---
+def infer_expense_category(merchant):
+    prompt = f"""
+Based on the merchant name below, return the most probable expense category from this list:
+- Food & Beverages
+- Marketing
+- Office Supplies
+- Software
+- Internet Services
+- Travel
+- Utilities
+- Rent
+- Other
 
-    try:
-        response = requests.post(API_URL, headers=headers, json=data)
-        result = response.json()
+Merchant: "{merchant}"
 
-        # Debug output for diagnosis
-        #st.write("🟡 Prompt Sent:", clean_text)
-        #st.write("🟢 API Raw Response:", result)
-
-        if "choices" in result and result["choices"]:
-            return result["choices"][0]["message"]["content"].strip()
-        elif "error" in result:
-            return f"[API_ERROR: {result['error'].get('message', 'unknown error')}]"
-        else:
-            return "[NO_RESPONSE]"
-
-    except Exception as e:
-        st.error(f"❌ OpenRouter API error: {e}")
-        return "[ERROR]"
+Only return the category. No formatting or explanation. If unclear, return: Other.
+"""
+    return call_openrouter(prompt)
 
 # --- Streamlit App UI ---
-st.set_page_config(page_title="CLOUD-IT US TOOLS", layout="wide")
-st.title("🧾 Merchant Name Extractor")
+st.set_page_config(page_title="CLOUD-IT TOOLS", layout="wide")
+st.title("🧾 Merchant Name & Category Extractor")
 
-uploaded_file = st.file_uploader("📤 Upload your Excel file (.xlsx only)", type=["xlsx"])
+uploaded_file = st.file_uploader("📤 Upload your Excel file", type=["xlsx"])
 
 if uploaded_file:
     df = pd.read_excel(uploaded_file)
-    df = df.astype(str)  # Arrow compatibility fix
+    df = df.astype(str)
     st.write("📊 Preview of uploaded data:")
     st.dataframe(df.head())
 
     selected_column = st.selectbox("🧩 Select the Payee Column", df.columns)
 
-    if st.button("🚀 Extract Merchant Names"):
-        with st.spinner("Working.."):
+    if st.button("🚀 Extract Merchant Names and Categories"):
+        with st.spinner("Running AI classification..."):
             df["Merchant Name"] = df[selected_column].apply(extract_merchant)
+            df["Expense Category"] = df["Merchant Name"].apply(infer_expense_category)
 
         st.success("✅ Extraction Complete!")
-        st.dataframe(df[[selected_column, "Merchant Name"]].head())
+        st.dataframe(df[[selected_column, "Merchant Name", "Expense Category"]].head())
 
         # Export Excel
         df_export = df.astype(str)
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
-            df_export.to_excel(writer, index=False, sheet_name="Merchant Names")
+            df_export.to_excel(writer, index=False, sheet_name="Results")
 
         st.download_button(
-            "📥 Download Excel with Merchant Names",
+            "📥 Download Excel",
             output.getvalue(),
-            file_name="merchant_names_openrouter.xlsx",
+            file_name="merchant_category_classified.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
