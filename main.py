@@ -54,8 +54,8 @@ Now return only the extracted merchant name:
         result = response.json()
 
         # Debug output for diagnosis
-        st.write("🟡 Prompt Sent:", clean_text)
-        st.write("🟢 API Raw Response:", result)
+        #st.write("🟡 Prompt Sent:", clean_text)
+        #st.write("🟢 API Raw Response:", result)
 
         if "choices" in result and result["choices"]:
             return result["choices"][0]["message"]["content"].strip()
@@ -70,8 +70,7 @@ Now return only the extracted merchant name:
 
 # --- Streamlit App UI ---
 st.set_page_config(page_title="CLOUD-IT US TOOLS", layout="wide")
-st.title("🧾 Merchant Name Extractor (GPT-3.5 via OpenRouter)")
-st.write("✅ Key length:", len(OPENROUTER_KEY))
+st.title("🧾 Merchant Name Extractor")
 
 uploaded_file = st.file_uploader("📤 Upload your Excel file (.xlsx only)", type=["xlsx"])
 
@@ -84,7 +83,7 @@ if uploaded_file:
     selected_column = st.selectbox("🧩 Select the Payee Column", df.columns)
 
     if st.button("🚀 Extract Merchant Names"):
-        with st.spinner("Calling GPT via OpenRouter... extracting..."):
+        with st.spinner("Working.."):
             df["Merchant Name"] = df[selected_column].apply(extract_merchant)
 
         st.success("✅ Extraction Complete!")
