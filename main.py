@@ -5,7 +5,7 @@ import re
 import io
 
 # --- OpenRouter API Setup ---
-OPENROUTER_KEY = "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"
+OPENROUTER_KEY=st.secrets["api"]["openrouter_key"]
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 headers = {
