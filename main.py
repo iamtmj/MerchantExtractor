@@ -10,7 +10,7 @@ API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 headers = {
     "Authorization": f"Bearer {OPENROUTER_KEY}",
-    "HTTP-Referer": "https://yourdomain.com",  # Required by OpenRouter
+    "HTTP-Referer": "https://streamlit.io",  # Required by OpenRouter
     "Content-Type": "application/json"
 }
 
