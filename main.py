@@ -71,6 +71,7 @@ Now return only the extracted merchant name:
 # --- Streamlit App UI ---
 st.set_page_config(page_title="CLOUD-IT US TOOLS", layout="wide")
 st.title("🧾 Merchant Name Extractor (GPT-3.5 via OpenRouter)")
+st.write("✅ Key length:", len(OPENROUTER_KEY))
 
 uploaded_file = st.file_uploader("📤 Upload your Excel file (.xlsx only)", type=["xlsx"])
 
