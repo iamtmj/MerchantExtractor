@@ -57,8 +57,8 @@ Now return only the extracted merchant name:
         return "[ERROR]"
 
 # --- Streamlit App UI ---
-st.set_page_config(page_title="Merchant Extractor (GPT via OpenRouter)", layout="wide")
-st.title("🧾 Merchant Name Extractor using GPT-3.5 (Free via OpenRouter)")
+st.set_page_config(page_title="CLOUD-IT US TOOLS", layout="wide")
+st.title("🧾 Merchant Name Extractor")
 
 uploaded_file = st.file_uploader("📤 Upload your Excel file", type=["xlsx"])
 
@@ -71,7 +71,7 @@ if uploaded_file:
     selected_column = st.selectbox("🧩 Select the Payee Column", df.columns)
 
     if st.button("🚀 Extract Merchant Names"):
-        with st.spinner("Calling GPT via OpenRouter... extracting..."):
+        with st.spinner("Working...."):
             df["Merchant Name"] = df[selected_column].apply(extract_merchant)
 
         st.success("✅ Extraction Complete!")
