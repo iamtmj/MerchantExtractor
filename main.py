@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 import re
 import io
-
+from tinydb import TinyDB, Query
 # --- OpenRouter API Setup ---
 OPENROUTER_KEY = st.secrets["api"]["openrouter_key"]
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
