@@ -53,7 +53,7 @@ def delete_category(cat_name):
 
 def call_openrouter(prompt):
     data = {
-        "model": "openai/gpt-3.5-turbo",
+        "model": "openai/gpt-4.1-mini",
         "messages": [{"role": "user", "content": prompt}]
     }
     response = requests.post(API_URL, headers=headers, json=data, timeout=30)
